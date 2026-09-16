@@ -79,6 +79,91 @@ resizeCanvas();
 preloadImages();
 setTimeout(onScroll, 200);
 
+// ---------- PINNED 3D SERVICE STAGE ----------
+const stageSection = document.querySelector('.services-3d');
+const stageCards = document.querySelectorAll('.stage-card');
+const stageDots = document.querySelectorAll('.dot');
+const STAGE_COUNT = stageCards.length;
+
+function updateStage(){
+  if(!stageSection) return;
+  const rect = stageSection.getBoundingClientRect();
+  const sectionHeight = stageSection.offsetHeight;
+  const viewportH = window.innerHeight;
+
+  // total scrollable distance within this pinned section
+  const scrollable = sectionHeight - viewportH;
+  const scrolled = Math.min(Math.max(-rect.top, 0), scrollable);
+  const overall = scrollable > 0 ? scrolled / scrollable : 0; // 0 -> 1 across whole section
+
+  const posInStages = overall * STAGE_COUNT; // 0 -> STAGE_COUNT
+
+  stageCards.forEach((card, i) => {
+    let diff = posInStages - i;
+    diff = Math.max(-1, Math.min(1, diff));
+
+    const rotateY = diff * -85;      // incoming from right, exits to left
+    const translateX = diff * 60;    // percent
+    const translateZ = -Math.abs(diff) * 420;
+    const opacity = 1 - Math.abs(diff);
+    const scale = 1 - Math.abs(diff) * 0.15;
+
+    card.style.transform = `translateX(${translateX}%) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`;
+    card.style.opacity = Math.max(0, opacity).toFixed(3);
+    card.style.pointerEvents = Math.abs(diff) < 0.5 ? 'auto' : 'none';
+    card.style.zIndex = Math.round((1 - Math.abs(diff)) * 10);
+  });
+
+  const activeIndex = Math.min(STAGE_COUNT - 1, Math.round(posInStages));
+  stageDots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
+}
+
+// ---------- GENERIC 3D SCROLL REVEAL ----------
+const revealEls = document.querySelectorAll('[data-reveal-3d]');
+
+function updateReveals(){
+  const viewportH = window.innerHeight;
+  revealEls.forEach(el => {
+    const rect = el.getBoundingClientRect();
+    // progress: 0 when element top is at bottom of viewport, 1 when at 65% up the viewport
+    const start = viewportH;
+    const end = viewportH * 0.35;
+    let progress = (start - rect.top) / (start - end);
+    progress = Math.max(0, Math.min(1, progress));
+
+    const dir = el.getAttribute('data-reveal-3d');
+    const delay = parseInt(el.getAttribute('data-reveal-delay') || '0', 10);
+    // stagger: shift progress slightly per delay index
+    const staggered = Math.max(0, Math.min(1, progress - delay * 0.08));
+
+    let transform = '';
+    if(dir === 'left'){
+      transform = `translateX(${(1-staggered) * -80}px) rotateY(${(1-staggered) * 25}deg)`;
+    } else if(dir === 'right'){
+      transform = `translateX(${(1-staggered) * 80}px) rotateY(${(1-staggered) * -25}deg)`;
+    } else {
+      transform = `translateY(${(1-staggered) * 60}px) rotateX(${(1-staggered) * 18}deg)`;
+    }
+    el.style.transform = transform;
+    el.style.opacity = staggered.toFixed(3);
+  });
+}
+
+let stageTicking = false;
+function onStageScroll(){
+  if(!stageTicking){
+    window.requestAnimationFrame(() => {
+      updateStage();
+      updateReveals();
+      stageTicking = false;
+    });
+    stageTicking = true;
+  }
+}
+window.addEventListener('scroll', onStageScroll, { passive:true });
+window.addEventListener('resize', onStageScroll);
+setTimeout(onStageScroll, 200);
+
 // ---------- Mobile nav toggle ----------
 const navToggle = document.querySelector('.nav-toggle');
 const mainNav = document.querySelector('.main-nav');

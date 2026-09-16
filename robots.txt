@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://khancommunication.pk/sitemap.xml
+Sitemap: https://YOUR-USERNAME.github.io/YOUR-REPO/sitemap.xml

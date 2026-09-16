@@ -97,40 +97,106 @@ h1,h2,h3{font-family:var(--display); font-weight:400; letter-spacing:0.01em; lin
   font-size:0.7rem; letter-spacing:0.3em; color:var(--muted); z-index:2;
 }
 
-/* ---------- SERVICE GRID ---------- */
-.grid-section{padding:120px 5% 80px;}
-.section-head{max-width:560px; margin-bottom:56px;}
-.section-head h2{font-size:clamp(2.2rem,4vw,3.2rem); margin-bottom:14px;}
-.section-head p{color:var(--muted); font-size:1rem; max-width:440px;}
-
-.service-grid{
-  display:grid;
-  grid-template-columns:repeat(3, 1fr);
-  gap:1px;
-  background:var(--line);
+/* ---------- SERVICES: PINNED 3D SCROLL STAGE ---------- */
+.services-3d{
+  position:relative;
+  height:500vh; /* 5 stages x 100vh of scroll room */
 }
-.service-card{
-  background:var(--bg);
+.services-3d-sticky{
+  position:sticky;
+  top:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  perspective:1400px;
+}
+.stage-heading{
+  position:absolute;
+  top:12%;
+  left:0; right:0;
+  text-align:center;
+  z-index:3;
+  padding:0 6%;
+}
+.stage-heading h2{font-size:clamp(1.8rem,4vw,2.8rem); margin-top:10px;}
+.stage-heading .eyebrow-plain{color:var(--green);}
+
+.stage-scene{
+  position:relative;
+  width:min(560px, 82vw);
+  height:min(420px, 52vh);
+  transform-style:preserve-3d;
+}
+.stage-card{
+  position:absolute;
+  inset:0;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:6px;
   padding:28px;
   display:flex;
   flex-direction:column;
+  justify-content:flex-end;
+  will-change:transform, opacity;
+  backface-visibility:hidden;
+  transform-style:preserve-3d;
 }
-.card-media{
-  height:160px;
-  border-radius:2px;
-  margin-bottom:20px;
-  position:relative;
-  display:flex; align-items:flex-end; padding:12px;
+.stage-card .card-media{
+  position:absolute;
+  inset:0;
+  border-radius:6px;
+  display:flex; align-items:flex-start; justify-content:center; padding:18px;
+  opacity:0.9;
 }
+.card-icon{
+  width:34%;
+  max-width:120px;
+  height:auto;
+  color:var(--muted);
+  opacity:0.55;
+  margin-top:8%;
+}
+.card-icon.icon-green{color:var(--green); opacity:0.8;}
+.card-icon.icon-blue{color:var(--blue); opacity:0.8;}
+.card-media .card-tag{position:absolute; top:18px; left:18px;}
+.stage-card h3, .stage-card p{position:relative; z-index:2;}
+.stage-card h3{
+  font-family:var(--body); font-size:1.4rem; font-weight:800;
+  margin-bottom:10px; letter-spacing:0;
+  text-shadow:0 2px 20px rgba(0,0,0,0.6);
+}
+.stage-card p{color:var(--muted); font-size:0.95rem; max-width:38ch; text-shadow:0 2px 12px rgba(0,0,0,0.5);}
 .card-tag{
   font-size:0.68rem; font-weight:700; letter-spacing:0.12em;
-  color:var(--muted);
+  color:var(--ink);
   border:1px solid var(--line);
+  background:rgba(0,0,0,0.35);
   padding:4px 10px;
   border-radius:20px;
 }
-.service-card h3{font-family:var(--body); font-size:1.15rem; font-weight:700; margin-bottom:10px; letter-spacing:0;}
-.service-card p{color:var(--muted); font-size:0.92rem; max-width:32ch;}
+
+.stage-dots{
+  position:absolute;
+  bottom:8%;
+  display:flex;
+  gap:10px;
+  z-index:3;
+}
+.dot{
+  width:8px; height:8px; border-radius:50%;
+  background:var(--line);
+  transition:background 0.3s ease, transform 0.3s ease;
+}
+.dot.active{background:var(--green); transform:scale(1.3);}
+
+/* ---------- GENERIC 3D SCROLL REVEAL ---------- */
+[data-reveal-3d]{
+  will-change:transform, opacity;
+  transition:transform 0.05s linear, opacity 0.05s linear;
+}
 
 /* ---------- FEATURE BLOCK ---------- */
 .feature-block{
